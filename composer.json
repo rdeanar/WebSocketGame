@@ -1,0 +1,14 @@
+{
+    "name": "deanar/node_ws_game",
+    "description": "Game test",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "deanar",
+            "email": "rdeanar@gmail.com"
+        }
+    ],
+    "require": {
+        "frameworks/jquery": "2.0.2"
+    }
+}
