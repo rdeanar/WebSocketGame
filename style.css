@@ -53,10 +53,23 @@
     border-right: 10px solid rgba(224, 224, 224, 0);
     border-bottom: 30px solid red;
 
-    -moz-transition: -moz-transform 0.2s;
-    -webkit-transition: -webkit-transform 0.2s;
-    -o-transition: -o-transform 0.2s;
-    transition:transform 0.2s;
+    -moz-transition:left 0.1s, -moz-transform 0.1s;
+    -webkit-transition:left 0.1s,  -webkit-transform 0.1s;
+    -o-transition:left 0.1s,  -o-transform 0.1s;
+    transition:left 0.1s, transform 0.1s;
+
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+
+
+    opacity: 0.75;
+
+    /*-moz-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 5px 5px 5px black;
+    -webkit-box-shadow: 5px 5px 5px black;
+    box-shadow: 5px 5px 5px black;
+    */
 }
 
 

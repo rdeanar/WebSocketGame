@@ -19,7 +19,10 @@ if($_SERVER['HTTP_HOST'] == 'localhost'){
     </script>
 
     <script type="text/javascript" src="vendor/frameworks/jquery/jquery.js"></script>
+    <script type="text/javascript" src="vendor/jQueryRotate.2.2.js"></script>
+
     <script type="text/javascript" src="<?=$config['ws']?>/socket.io/socket.io.js"></script>
+    <script src="client_model_arrow.js?<?=rand(111,999)?>"></script>
     <script src="client.js?<?=rand(111,999)?>"></script>
 </head>
 <body>

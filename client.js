@@ -1,16 +1,5 @@
 window.wsg = window.wsg || {};
 
-
-// Создаем текст сообщений для событий
-strings = {
-    'connected': '[sys][time]%time%[/time]: Вы успешно соединились к сервером как [user]%name%[/user].[/sys]',
-    'userJoined': '[sys][time]%time%[/time]: Пользователь [user]%name%[/user] присоединился к чату.[/sys]',
-    'messageSent': '[out][time]%time%[/time]: [user]%name%[/user]: %text%[/out]',
-    'messageReceived': '[in][time]%time%[/time]: [user]%name%[/user]: %text%[/in]',
-    'userSplit': '[sys][time]%time%[/time]: Пользователь [user]%name%[/user] покинул чат.[/sys]'
-};
-
-
 wsg.init = function(){
     // Создаем соединение с сервером; websockets почему-то в Хроме не работают, используем xhr
     if (navigator.userAgent.toLowerCase().indexOf('chrome') != -1 && false) {
@@ -31,6 +20,9 @@ wsg.init = function(){
     });
 
     wsg.bind();
+
+    wsg.xArrow = Arrow;
+    wsg.xArrow.init($('#slider2 > .square'));
 
 };
 
@@ -58,9 +50,11 @@ wsg.tilt = function(coord){
 
     socket.emit('gamepadTilt',coord);
 
-    wsg.updateSlider($('#slider1 > .square'),coord[0]);
-    wsg.updateSlider($('#slider2 > .square'),coord[1]);
-    wsg.updateSlider($('#slider3 > .square'),coord[2]);
+    wsg.xArrow.inputDegrees(coord[1]);
+//    wsg.updateSlider($('#slider1 > .square'),coord[0]);
+//    wsg.updateSlider($('#slider2 > .square'),coord[1]);
+//    wsg.updateSlider($('#slider3 > .square'),coord[2]);
+
 }
 
 wsg.bind = function(){
@@ -78,49 +72,18 @@ wsg.bind = function(){
             wsg.processMessage('Gamepad joined successful, ID: ' + client_id);
         });
 
-
-        var tilt_last = 0;
-        var tilt_interval = setInterval(function(){
-            var $el = $('#slider2 > .square');
-            var tilt_now = $el.data('tilt');
-            var $className = '';
-
-            if(tilt_last < tilt_now){
-                $className = 'right';
-            }else{
-                $className = 'left';
-            }
-
-            var $dx = Math.abs(tilt_last - tilt_now);
-
-            if($dx <= 25){
-                $className = '';
-            }else if($dx > 40){
-                $className += '2';
-            }else if($dx > 25){
-                $className += '1';
-            }
-
-            if(tilt_last != 0){
-                console.log('BINGO!!');
-            }
-
-            $el.removeClass('left1').removeClass('left2').removeClass('right1').removeClass('right2');
-            if($className != ''){
-                $el.addClass($className);
-
-                console.log($className);
-            }
-
-        },200);
-
         socket.on('gamepadTiltReaction',function(coord){
             //socket.emit('gamepadTilt', coord);
 //            console.log(coord);
             $('#console').html( coord.join('<br>') );
 
+
+            wsg.xArrow.inputDegrees(coord[1]);
+
             //wsg.updateSlider($('#slider1 > .square'),coord[0]);
-            wsg.updateSlider($('#slider2 > .square'),coord[1]);
+
+            //wsg.updateSlider($('#slider2 > .square'),coord[1]);
+
             //wsg.updateSlider($('#slider3 > .square'),coord[2]);
         });
 
