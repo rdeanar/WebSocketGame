@@ -2,56 +2,50 @@
 
 var Arrow = {};
 (function () {
-    Arrow.element = null;
-
-    Arrow.start = false;
-    Arrow.position = 0;
-    Arrow.currentDegrees = 0;
-    Arrow.lastDegrees = 0;
-
-    Arrow.moveInterval = null;
-
-    Arrow.options = {
-        move: true,
-        speed: 0.5,
-        shift: 360,
-        scale: 1,
-        updateMoveRate: 20,
-        updateTiltRate: 200,
-        mode: 'canvans' // for back compatible
-    };
     Arrow.init = function ($element, $options) {
-        Arrow.element = $element;
+
+        this.element = $element;
+
+        this.start = false;
+        this.position = 0;
+        this.currentDegrees = 0;
+        this.lastDegrees = 0;
+
+        this.moveInterval = null;
+
+        this.options = {
+            move: true,
+            speed: 0.5,
+            shift: 360,
+            scale: 1,
+            updateMoveRate: 20,
+            updateTiltRate: 200,
+            mode: 'canvans' // for back compatible
+        };
+
+
         $.extend(Arrow.options, $options);
-        Arrow.calculateMove();
 
         this.inputDegrees = function (degrees) {
-            Arrow.currentDegrees = degrees;
-            Arrow.start = true;
+            this.currentDegrees = degrees;
+            this.start = true;
         };
-    };
 
-    /*
-     Arrow.inputDegrees = function (degrees) {
-     Arrow.currentDegrees = degrees;
-     Arrow.start = true;
-     };
-     */
+        this.moveArrowCss = function (x) {
+            var $el = this.element;
+            $el.css('left', x);
+        };
 
-    Arrow.moveArrowCss = function (x) {
-        var $el = Arrow.element;
-        $el.css('left', x);
-    };
+        this.rotateArrowCss = function (deg) {
+            var $el = this.element;
+            $el.rotate(deg);
+        };
 
-    Arrow.rotateArrowCss = function (deg) {
-        var $el = Arrow.element;
-        $el.rotate(deg);
-    };
 
-    Arrow.calculateMove = function () {
-        var model = Arrow;
+        var model = this;
         var $el = model.element;
         var moveInterval = setInterval(function () {
+
             if (model.start && $el != null) {
 
                 var positionDx = parseInt((model.options.speed * model.currentDegrees));
@@ -73,12 +67,13 @@ var Arrow = {};
                 }
                 var degreesDx = model.currentDegrees - model.lastDegrees;
 
-                //$el.css('left', positionAbsolute).rotate(currentTilt);
-                //$el.css('left', positionAbsolute).rotate(currentTilt);
-                if (model.options.mode == 'css') {
+//                    if (model.options.mode == 'css') {
+
+                if (model.element instanceof jQuery) {
                     model.moveArrowCss(positionAbsolute);
                     model.rotateArrowCss(currentTilt);
                 } else {
+
                     model.element.setX(positionAbsolute);
                     model.element.rotateDeg(degreesDx);
                     var layer = model.element.getLayer();
@@ -91,5 +86,6 @@ var Arrow = {};
         }, model.options.updateMoveRate);
     };
 
+//        this.calculateMove();
 
 })();
