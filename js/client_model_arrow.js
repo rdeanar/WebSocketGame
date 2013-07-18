@@ -24,7 +24,7 @@ var Arrow = {};
         };
 
 
-        $.extend(Arrow.options, $options);
+        $.extend(this.options, $options);
 
         this.inputDegrees = function (degrees) {
             this.currentDegrees = degrees;
