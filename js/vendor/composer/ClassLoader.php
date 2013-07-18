@@ -77,22 +77,22 @@ class ClassLoader
     /**
      * Registers a set of classes, merging with any others previously set.
      *
-     * @param string       $prefix  The classes prefix
+     * @param string $prefix  The classes prefix
      * @param array|string $paths   The location(s) of the classes
-     * @param bool         $prepend Prepend the location(s)
+     * @param bool $prepend Prepend the location(s)
      */
     public function add($prefix, $paths, $prepend = false)
     {
         if (!$prefix) {
             if ($prepend) {
                 $this->fallbackDirs = array_merge(
-                    (array) $paths,
+                    (array)$paths,
                     $this->fallbackDirs
                 );
             } else {
                 $this->fallbackDirs = array_merge(
                     $this->fallbackDirs,
-                    (array) $paths
+                    (array)$paths
                 );
             }
 
@@ -101,19 +101,19 @@ class ClassLoader
 
         $first = $prefix[0];
         if (!isset($this->prefixes[$first][$prefix])) {
-            $this->prefixes[$first][$prefix] = (array) $paths;
+            $this->prefixes[$first][$prefix] = (array)$paths;
 
             return;
         }
         if ($prepend) {
             $this->prefixes[$first][$prefix] = array_merge(
-                (array) $paths,
+                (array)$paths,
                 $this->prefixes[$first][$prefix]
             );
         } else {
             $this->prefixes[$first][$prefix] = array_merge(
                 $this->prefixes[$first][$prefix],
-                (array) $paths
+                (array)$paths
             );
         }
     }
@@ -121,17 +121,17 @@ class ClassLoader
     /**
      * Registers a set of classes, replacing any others previously set.
      *
-     * @param string       $prefix The classes prefix
+     * @param string $prefix The classes prefix
      * @param array|string $paths  The location(s) of the classes
      */
     public function set($prefix, $paths)
     {
         if (!$prefix) {
-            $this->fallbackDirs = (array) $paths;
+            $this->fallbackDirs = (array)$paths;
 
             return;
         }
-        $this->prefixes[substr($prefix, 0, 1)][$prefix] = (array) $paths;
+        $this->prefixes[substr($prefix, 0, 1)][$prefix] = (array)$paths;
     }
 
     /**
@@ -176,7 +176,7 @@ class ClassLoader
     /**
      * Loads the given class or interface.
      *
-     * @param  string    $class The name of the class
+     * @param  string $class The name of the class
      * @return bool|null True if loaded, null otherwise
      */
     public function loadClass($class)

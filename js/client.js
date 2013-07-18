@@ -1,6 +1,6 @@
 window.wsg = window.wsg || {};
 
-wsg.init = function(){
+wsg.init = function () {
     // Создаем соединение с сервером; websockets почему-то в Хроме не работают, используем xhr
     if (navigator.userAgent.toLowerCase().indexOf('chrome') != -1 && false) {
         //socket = io.connect(config.ws, {'transports': ['xhr-polling']});
@@ -21,46 +21,83 @@ wsg.init = function(){
 
     wsg.bind();
 
-    wsg.xArrow = Arrow;
-    wsg.xArrow.init($('#slider2 > .square'));
+    wsg.setupWorld();
+
+    wsg.xArrowCss = new Arrow.init($('#slider2 > .square'), {mode: 'css'});
+    wsg.xArrow = new Arrow.init(wsg.world.objects.arrow, {mode: 'canvans'});
+
 
 };
 
-wsg.processMessage = function(msg){
-    if(msg.event && msg.event == 'messageSent' && false){
-        document.querySelector('#log').innerHTML += '<div class="message">' + msg.name + ': ' + msg.text + '</div>';
-    }else{
+wsg.world = {
+    stage: null,
+    layer: null,
 
-    // Добавляем в лог сообщение, заменив время, имя и текст на полученные
-    document.querySelector('#log').innerHTML += '<div class="message">' + (msg.name || '') + ': ' + (msg.text || msg) + '</div>';
+    objects: {},
+
+    dummy: null
+};
+
+wsg.setupWorld = function () {
+    var stage = new Kinetic.Stage({
+        container: 'canvans',
+        width: 740,
+        height: 200
+    });
+
+    wsg.world.stage = stage;
+
+    var layer = new Kinetic.Layer();
+
+    wsg.world.layer = layer;
+
+
+    var poly = new Kinetic.Polygon({
+        points: [10, 10, 0, -20, -10, 10],
+        fill: Kinetic.Util.getRandomColor(),
+        stroke: Kinetic.Util.getRandomColor(),
+        strokeWidth: 1,
+        x: 100,
+        y: 100,
+
+        draggable: false,
+        id: 'canArrow'
+    });
+    wsg.world.objects.arrow = poly;
+
+    wsg.world.layer.add(wsg.world.objects.arrow);
+    wsg.world.stage.add(wsg.world.layer);
+}
+
+wsg.processMessage = function (msg) {
+    if (msg.event && msg.event == 'messageSent' && false) {
+        document.querySelector('#log').innerHTML += '<div class="message">' + msg.name + ': ' + msg.text + '</div>';
+    } else {
+
+        // Добавляем в лог сообщение, заменив время, имя и текст на полученные
+        document.querySelector('#log').innerHTML += '<div class="message">' + (msg.name || '') + ': ' + (msg.text || msg) + '</div>';
     }
     // Прокручиваем лог в конец
     document.querySelector('#log').scrollTop = document.querySelector('#log').scrollHeight;
 }
 
-wsg.updateSlider = function(object, value){
-    $(object).css('left',value + 180).data('tilt',value).attr('data-tilt',value);
-}
 
-wsg.tilt = function(coord){
+wsg.tilt = function (coord) {
     //console.log(coord);
 
-    $('#console').text( coord.join(', ') );
+    $('#console').text(coord.join(', '));
     //wsg.processMessage( coord.join(', ') );
 
-    socket.emit('gamepadTilt',coord);
+    socket.emit('gamepadTilt', coord);
 
-    wsg.xArrow.inputDegrees(coord[1]);
-//    wsg.updateSlider($('#slider1 > .square'),coord[0]);
-//    wsg.updateSlider($('#slider2 > .square'),coord[1]);
-//    wsg.updateSlider($('#slider3 > .square'),coord[2]);
-
+    if (wsg.xArrow) wsg.xArrow.inputDegrees(coord[1]);
+    if (wsg.xArrowCss) wsg.xArrowCss.inputDegrees(coord[1]);
 }
 
-wsg.bind = function(){
+wsg.bind = function () {
 
-    if(wsg.env == 'display'){
-        $('#createGame').click(function(){
+    if (wsg.env == 'display') {
+        $('#createGame').click(function () {
             socket.emit('displayConnect');
             socket.on('gameCreated', function (game_id) {
                 wsg.processMessage('game created with ID: ' + game_id);
@@ -72,24 +109,16 @@ wsg.bind = function(){
             wsg.processMessage('Gamepad joined successful, ID: ' + client_id);
         });
 
-        socket.on('gamepadTiltReaction',function(coord){
+        socket.on('gamepadTiltReaction', function (coord) {
             //socket.emit('gamepadTilt', coord);
-//            console.log(coord);
-            $('#console').html( coord.join('<br>') );
-
-
-            wsg.xArrow.inputDegrees(coord[1]);
-
-            //wsg.updateSlider($('#slider1 > .square'),coord[0]);
-
-            //wsg.updateSlider($('#slider2 > .square'),coord[1]);
-
-            //wsg.updateSlider($('#slider3 > .square'),coord[2]);
+            $('#console').html(coord.join('<br>'));
+            if (wsg.xArrow) wsg.xArrow.inputDegrees(coord[1]);
+            if (wsg.xArrowCss) wsg.xArrowCss.inputDegrees(coord[1]);
         });
 
 
     }
-    if(wsg.env == 'gamepad'){
+    if (wsg.env == 'gamepad') {
 
 
         if (window.DeviceOrientationEvent) {
@@ -111,11 +140,10 @@ wsg.bind = function(){
         }
 
 
-
-        $('#joinGame').click(function(){
+        $('#joinGame').click(function () {
             var game_id = $('#game_id').val();
-            if(game_id.length > 0){
-                socket.emit('gamepadJoin',game_id);
+            if (game_id.length > 0) {
+                socket.emit('gamepadJoin', game_id);
                 socket.on('gamepadJoined', function (game_id) {
                     wsg.processMessage('join successful to game: ' + game_id);
                 });
@@ -130,16 +158,13 @@ wsg.bind = function(){
     } // end GAMEPAD section
 
 
-
     socket.on('gameDestroy', function (message) {
         wsg.processMessage('GAME DESTROY. Possible reason: ' + message);
     });
 
 
-
-
     // При нажатии <Enter> или кнопки отправляем текст
-    document.querySelector('#input').onkeypress = function(e) {
+    document.querySelector('#input').onkeypress = function (e) {
         if (e.which == '13') {
             // Отправляем содержимое input'а, закодированное в escape-последовательность
             socket.send(escape(document.querySelector('#input').value));
@@ -148,7 +173,7 @@ wsg.bind = function(){
         }
     };
 
-    document.querySelector('#send').onclick = function() {
+    document.querySelector('#send').onclick = function () {
         socket.send(escape(document.querySelector('#input').value));
         document.querySelector('#input').value = '';
     };
